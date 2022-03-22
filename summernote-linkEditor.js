@@ -264,9 +264,9 @@
                                 $url.keyup();
                             }
                         };
-                        $email.keyup(autoFillUrl);
-                        $subject.keyup(autoFillUrl);
-                        $body.keyup(autoFillUrl);
+                        $email.on('input paste propertychange', autoFillUrl);
+                        $subject.on('input paste propertychange', autoFillUrl);
+                        $body.on('input paste propertychange', autoFillUrl);
 
                         /*bind url to title inputs and enable/disable save button*/
                         var $title = $dialog.find('.note-link-title');
