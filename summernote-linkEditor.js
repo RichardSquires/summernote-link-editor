@@ -210,7 +210,7 @@
                             }
                             /*create link */
                             if($url.val() == '' || !$url.val().startsWith('mailto:')) {
-                                var link = 'mailto:'.concat(encodeURI($email.val()));
+                                var link = 'mailto:'.concat(encodeURIComponent($email.val()));
                                 if($subject.val().length > 0)
                                 {
                                     link += '?subject='.concat(encodeURIComponent($subject.val()));
@@ -225,7 +225,7 @@
                                 /*else update link (preserves pasted ) */
                                 var currentUrl= $url.val();
                                 /*update or add subject */
-                                var subjectWithVal = "subject=".concat(encodeURIComponent($subject.val()));
+                                var subjectWithVal = 'subject='.concat(encodeURIComponent($subject.val()));
                                 var subjectRegEx = /(subject=.*?.&)/i /*subject param has surrounding parameters */
                                 var subjectAtEndRegEx = /(subject=.*?$)/i
                                 if(subjectRegEx.test(currentUrl)) {
@@ -234,11 +234,12 @@
                                 } else if (subjectAtEndRegEx.test(currentUrl)) {
                                     currentUrl = currentUrl.replace(subjectAtEndRegEx, subjectWithVal);
                                 } else if ($subject.val().length > 0) {
-                                    currentUrl += "&".concat(subjectWithVal);
+                                    var joinChar = currentUrl.indexOf('?') === -1 ? '?' : '&';
+                                    currentUrl += joinChar.concat(subjectWithVal);
                                 }
 
                                 /*update or add body */
-                                var bodyWithVal = "body=".concat(encodeURIComponent($body.val()));
+                                var bodyWithVal = 'body='.concat(encodeURIComponent($body.val()));
                                 var bodyRegEx = /(body=.*?.&)/i /*body param has surrounding parameters */
                                 var bodyAtEndRegEx = /(body=.*?$)/i
                                 if(bodyRegEx.test(currentUrl)) {
@@ -247,7 +248,8 @@
                                 } else if (bodyAtEndRegEx.test(currentUrl)) {
                                     currentUrl = currentUrl.replace(bodyAtEndRegEx, bodyWithVal);
                                 } else if ($body.val().length > 0) {
-                                    currentUrl += "&".concat(bodyWithVal);
+                                    var joinChar = currentUrl.indexOf('?') === -1 ? '?' : '&';
+                                    currentUrl += joinChar.concat(bodyWithVal);
                                 }
 
                                 /*Update email */
@@ -258,7 +260,7 @@
                                     emailInLink = /(:.*)/
                                     endChar = '';
                                 }
-                                currentUrl.replace(emailInLink, ":".concat(encodeURIComponent($email.val()),endChar))
+                                currentUrl = currentUrl.replace(emailInLink, ":".concat(encodeURIComponent($email.val()),endChar))
 
                                 $url.val(currentUrl);
                                 $url.keyup();
@@ -371,7 +373,7 @@
                                     const part = urlParts[partIndex];
                                     const testPart = part.toLowerCase().trim();
                                     if(testPart === "mailto:") {
-                                        $email.val(decodeURI(urlParts[partIndex+1]));
+                                        $email.val(decodeURIComponent(urlParts[partIndex+1]));
                                         continue;
                                     }
                                     if(testPart.startsWith('subject=')) {
