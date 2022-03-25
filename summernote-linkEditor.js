@@ -194,6 +194,7 @@
                         });
 
                         /*generate email link on the fly */
+                        var $title = $dialog.find('.note-link-title');
                         var $url = $dialog.find('.note-link-href');
                         var $email = $dialog.find('.note-link-email');
                         var $subject = $dialog.find('.note-link-subject');
@@ -208,22 +209,21 @@
                                 if($url.val().indexOf('mailto:') > -1) { $url.val(''); }
                                 return;
                             }
+                            var currentUrl = $url.val();
                             /*create link */
-                            if($url.val() == '' || !$url.val().startsWith('mailto:')) {
-                                var link = 'mailto:'.concat(encodeURIComponent($email.val()));
+                            if(currentUrl == '' || !currentUrl.startsWith('mailto:')) {
+                                currentUrl = 'mailto:'.concat(encodeURIComponent($email.val()));
                                 if($subject.val().length > 0)
                                 {
-                                    link += '?subject='.concat(encodeURIComponent($subject.val()));
+                                    currentUrl += '?subject='.concat(encodeURIComponent($subject.val()));
                                 }
                                 if($body.val().length > 0)
                                 {
-                                    var paramJoin = link.indexOf('?') > -1 ? '&' : '?';
-                                    link += paramJoin.concat(encodeURIComponent($body.val()));
+                                    var paramJoin = currentUrl.indexOf('?') > -1 ? '&' : '?';
+                                    currentUrl += paramJoin.concat(encodeURIComponent($body.val()));
                                 }
-                                $url.val(link);
                             } else {
                                 /*else update link (preserves pasted ) */
-                                var currentUrl= $url.val();
                                 /*update or add subject */
                                 var subjectWithVal = 'subject='.concat(encodeURIComponent($subject.val()));
                                 var subjectRegEx = /(subject=.*?.&)/i /*subject param has surrounding parameters */
@@ -261,19 +261,28 @@
                                     endChar = '';
                                 }
                                 currentUrl = currentUrl.replace(emailInLink, ":".concat(encodeURIComponent($email.val()),endChar))
-
-                                $url.val(currentUrl);
-                                $url.keyup();
                             }
+
+                            $url.val(currentUrl);
+                            /*Keep link text up to date with email if was empty to begin with*/
+                            var newText = $email.val()
+                            var oldText = $title.val();
+                            if(!oldText 
+                                || oldText === newText.substring(0,newText.length - 1)
+                                || oldText.substring(0, oldText.length - 1) === newText
+                            ) {
+                                $title.val(newText);
+                            }
+                            /*All changes ready trigger validation for link text */
+                            $title.trigger('input');
                         };
                         $email.on('input paste propertychange', autoFillUrl);
                         $subject.on('input paste propertychange', autoFillUrl);
                         $body.on('input paste propertychange', autoFillUrl);
 
                         /*bind url to title inputs and enable/disable save button*/
-                        var $title = $dialog.find('.note-link-title');
                         var checkFormValid = function() {
-                            var isDisabled = $title.val().length === 0 && $url.val().length === 0
+                            var isDisabled = $title.val().length === 0 || $url.val().length === 0
                             $dialog.find('.note-btn.note-advLink-btn').prop('disabled', isDisabled)
                         }
                         $url.on('input paste propertychange',function() {
@@ -281,6 +290,17 @@
                             var oldText = $title.val();
                             if(!$title.val() 
                                 || $title.val() === newText.substring(0,newText.length - 1)
+                                || oldText.substring(0, oldText.length - 1) === newText
+                            ) {
+                                $title.val(newText);
+                            }
+                            checkFormValid();
+                        });
+                        $url.on('input paste propertychange',function() {
+                            var newText = $url.val()
+                            var oldText = $title.val();
+                            if(!oldText 
+                                || oldText === newText.substring(0,newText.length - 1)
                                 || oldText.substring(0, oldText.length - 1) === newText
                             ) {
                                 $title.val(newText);
@@ -398,6 +418,9 @@
                             $body.val("");
                         }
                         
+                        /*Validate link editor form on load */
+                        $title.trigger('input');
+
                         self.bindEnterKey($editBtn);
                     });
                     ui.onDialogHidden(self.$dialog, function () {
