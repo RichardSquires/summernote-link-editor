@@ -17,7 +17,15 @@
                 address: "Email address",
                 subject: "Subject line",
                 body: "Body text"
+            },
+         'de-DE': {
+            linkEditor: {
+                email: "E-Mail",
+                address: "E-Mail Adresse",
+                subject: "Betreffzeile",
+                body: "Nachricht (kurzer Text)"
             }
+         },   
         }
     });
     $.extend($.summernote.options, {
@@ -240,8 +248,8 @@
 
                                 /*update or add body */
                                 var bodyWithVal = 'body='.concat(encodeURIComponent($body.val()));
-                                var bodyRegEx = /(body=.*?.&)/i /*body param has surrounding parameters */
-                                var bodyAtEndRegEx = /(body=.*?$)/i
+                                var bodyRegEx = /(body=.*?.&)/i; /*body param has surrounding parameters */
+                                var bodyAtEndRegEx = /(body=.*?$)/i;
                                 if(bodyRegEx.test(currentUrl)) {
                                     bodyWithVal = bodyWithVal.concat("&");
                                     currentUrl = currentUrl.replace(bodyRegEx, bodyWithVal);
@@ -401,7 +409,7 @@
                                         $subject.val(decodeURIComponent(subject));
                                         continue;
                                     }
-                                    if(testPart.startsWith('body=') === 0) {
+                                    if(testPart.startsWith('body=')) {
                                         var body = part.replace('body=', '');
                                         $body.val(decodeURIComponent(body));
                                         continue;
